@@ -1,14 +1,17 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-const Listing = require("./modules/listing");
+const Listing = require("./modules/listing.js");
 const path = require("path");
 const methodOveride=require("method-override");
 const { runInNewContext } = require("vm");
 const ejsMate=require("ejs-mate");
-const wrapAsync=require("./utils/wrapasync.js")
-const ExpressError=require("./utils/ExpressError.js")
-const {listingSchema}=require("./schema.js");
+const wrapAsync=require("./utils/wrapasync.js");
+const ExpressError=require("./utils/ExpressError.js");
+const {listingSchema,reviewSchema}=require("./schema.js");
+const Review = require("./modules/review.js");
+const review = require("./modules/review.js");
+const { log } = require("console");
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -52,11 +55,11 @@ app.get("/listings/new", (req, res) => {
 // Show route
 app.get("/listings/:id", wrapAsync(async (req, res) => {
     const { id } = req.params;
-    const listing = await Listing.findById(id);
+    const listing = await Listing.findById(id).populate("reviews");
     res.render("listings/show.ejs", { listing });
 }));
 
-// Create route 
+// --------------------------------Create route 
 // handling try and catch 
 // app.post("/listings", async (req, res,next) => {
 //     try{
@@ -104,6 +107,26 @@ app.delete("/listings/:id",wrapAsync(async(req,res)=>{
     res.redirect("/listings");
 }));
 
+//route for reviews/feedback
+app.post("/listings/:id/reviews",wrapAsync(async(req,res,next)=>{
+    validateReview(req,res,next);
+    let listing=await Listing.findById(req.params.id);
+
+    let newReview=await new Review(req.body.review);
+    await newReview.save();
+    listing.reviews.push(newReview);
+    await listing.save();
+    res.redirect(`/listings/${listing._id}`); 
+}));
+
+// delete review route
+app.delete("/listings/:id/reviews/:reviewId", wrapAsync(async (req, res, next) => {
+    let { id, reviewId } = req.params;
+    let review = await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/listings/${id}`);
+}));
+
+
 app.use("*",(req,res,next)=>{
     next(new ExpressError(404,"Page Not Found !"));
 });
@@ -117,6 +140,13 @@ app.use((err,req,res,next)=>{
 // validate listing 
 const validateListing=(req,res,next)=>{
     let result=listingSchema.validate(req.body);
+    if(result.error){
+        throw new ExpressError(400,result.error);
+    };
+};
+
+const validateReview=(req,res,next)=>{
+    let result=reviewSchema.validate(req.body);
     if(result.error){
         throw new ExpressError(400,result.error);
     };
