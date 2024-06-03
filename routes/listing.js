@@ -30,6 +30,10 @@ router.get("/new", (req, res) => {
 router.get("/:id", wrapAsync(async (req, res) => {
     const { id } = req.params;
     const listing = await Listing.findById(id).populate("reviews");
+    if(!listing){
+        req.flash("error","Listing does not exist!");
+        res.redirect("/listings");
+    }
     res.render("listings/show.ejs", { listing });
 }));
 
@@ -45,8 +49,9 @@ router.get("/:id", wrapAsync(async (req, res) => {
 //         next(err);
 //     }
 // });
-//create route 
 // anotherway of handling error using wrapasync instead try
+
+//create route 
 router.post("/",wrapAsync(async (req,res,next)=>{
     // if(!req.body.listing){
     //     throw new ExpressError(400,"Send Valid data for Listing");
@@ -54,6 +59,7 @@ router.post("/",wrapAsync(async (req,res,next)=>{
     validateListing(req,res,next);
     const data = new Listing(req.body.listing);
         await data.save();
+        req.flash("success","New Listing Created!");
         res.redirect("/listings");
 }));
 
@@ -61,16 +67,21 @@ router.post("/",wrapAsync(async (req,res,next)=>{
 router.get("/:id/edit",wrapAsync(async(req,res)=>{
     let {id}=req.params;
     const listing=await Listing.findById(id);
+    if(!listing){
+        req.flash("error","Listing does not exist!");
+        res.redirect("/listings");
+    }
     res.render("listings/edit.ejs",{listing});
 }));
 
 router.put("/:id",wrapAsync(async(req,res,next)=>{
     // if(!req.body.listing){
-    //     throw new ExpressError(400,"Send Valid data for Listing");
-    // }
-    validateListing(req,res,next);
-    let {id}=req.params;
-    const data=await Listing.findByIdAndUpdate(id,{...req.body.listing});
+        //     throw new ExpressError(400,"Send Valid data for Listing");
+        // }
+        validateListing(req,res,next);
+        let {id}=req.params;
+        const data=await Listing.findByIdAndUpdate(id,{...req.body.listing});
+    req.flash("success","Listing updated successfully!");
     res.redirect("/listings");
 }));
 
@@ -78,6 +89,7 @@ router.put("/:id",wrapAsync(async(req,res,next)=>{
 router.delete("/:id",wrapAsync(async(req,res)=>{
     let {id}=req.params;
     await Listing.findByIdAndDelete(id);
+    req.flash("success","Listing deleted successfully!");
     res.redirect("/listings");
 }));
 
