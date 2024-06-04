@@ -3,8 +3,8 @@ const router=express.Router({mergeParams:true});
 const wrapAsync=require("../utils/wrapasync.js");
 const ExpressError=require("../utils/ExpressError.js");
 const {reviewSchema}=require("../schema.js");
-const Listing = require("../modules/listing.js");
-const Review = require("../modules/review.js");
+const Listing = require("../models/listing.js");
+const Review = require("../models/review.js");
 
 
 const validateReview=(req,res,next)=>{

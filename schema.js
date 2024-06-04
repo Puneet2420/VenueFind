@@ -1,6 +1,6 @@
 //this is npm package for validation of schema 
 const Joi=require('joi');
-const review = require('./modules/review');
+const review = require('./models/review');
 module.exports.listingSchema=Joi.object({
     listing:Joi.object({
         title:Joi.string().required(),
