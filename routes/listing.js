@@ -5,6 +5,43 @@ const { isLoggedIn, isOwner, validateListing } = require("../middleware.js");
 const { index, renderNewForm, showListings, createNewListing, renderEditForm, updateListing, destroyListing } = require("../controllers/listings.js");
 
 
+router
+    .route("/")
+    .get(wrapAsync(index))
+    .post(isLoggedIn,
+        validateListing,
+        wrapAsync(createNewListing));
+
+
+// Create new route
+router.get("/new", isLoggedIn, renderNewForm);
+
+router
+    .route("/:id")
+    .get(wrapAsync(showListings))
+    .put(
+        isLoggedIn,
+        isOwner,
+        validateListing,
+        wrapAsync(updateListing))
+    .delete(
+        isLoggedIn,
+        isOwner,
+        wrapAsync(destroyListing));
+
+//edit route
+router.get("/:id/edit", isLoggedIn, isOwner,
+    wrapAsync(renderEditForm));
+//export
+module.exports = router;
+
+
+
+
+
+
+/* //Another way for this to make compact code is given above 
+
 // Index route
 router.get("/", wrapAsync(index));
 
@@ -39,3 +76,5 @@ router.delete(
     wrapAsync(destroyListing));
 
 module.exports = router;
+    
+    */
