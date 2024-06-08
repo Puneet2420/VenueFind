@@ -86,3 +86,9 @@ height: 50vh;
 /* width: 18rem; */
 }
 
+
+/* map styling */
+#map{
+    height: 300px;
+    width: 100vh;
+}
