@@ -6,7 +6,7 @@
                 <%= listing.title %>
             </h2>
             <div class="card col-8 listing-card">
-                <img src="<%= listing.image %>" class="card-img-top show-img" alt="...">
+                <img src="<%= listing.image.url %>" class="card-img-top show-img" alt="...">
                 <div class="card-body">
                     <li><b>Owned by</b> : @<%=listing.owner.username%>
                     </li>
@@ -23,8 +23,8 @@
                 </div>
             </div>
             <% if(currUser && currUser._id.equals(listing.owner._id)){ %>
-                <a href="/listings/<%= listing._id %>/edit">UPDATE</a>
-                <br>
+                <a href="/listings/<%= listing._id %>/edit"><button class="btn btn-success btn-sm" >Edit</button></a>
+                <br> <br>
                 <form action="/listings/<%=listing._id %>?_method=DELETE" method="POST">
                     <button class="btn btn-danger btn-sm">Delete</button>
                 </form>
@@ -40,7 +40,7 @@
             <form action="/listings/<%=listing._id %>/reviews" method="post" novalidate class="needs-validation">
                 <div class="mb-3 mt-2">
                     <fieldset class="starability-slot">
-                        <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="0" checked
+                        <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="2" checked
                             aria-label="No rating." />
                         <input type="radio" id="first-rate1" name="review[rating]" value="1" />
                         <label for="first-rate1" title="Terrible">1 star</label>
